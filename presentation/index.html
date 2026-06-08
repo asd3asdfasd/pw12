@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Защита ВКR — Воробьёв П.А.</title>
+<style>
+  :root{
+    --navy:#0B2545; --navy2:#13315C; --blue:#1B4965; --accent:#E63946;
+    --amber:#F4A261; --steel:#5C7A99; --bg:#F4F6FA; --ink:#1D2433;
+    --muted:#5B6675; --line:#E1E7EF; --ok:#2A9D8F; --gold:#C9A227;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{height:100%;}
+  body{
+    font-family:'Segoe UI',-apple-system,Roboto,'Helvetica Neue',Arial,sans-serif;
+    background:#0a1626; color:var(--ink); overflow:hidden;
+  }
+  /* ---------- DECK ---------- */
+  .deck{position:fixed; inset:0; display:flex; align-items:center; justify-content:center;}
+  .slide{
+    position:absolute; width:1280px; height:720px; background:var(--bg);
+    border-radius:6px; overflow:hidden; opacity:0; transform:scale(.96);
+    transition:opacity .35s ease, transform .35s ease; pointer-events:none;
+    box-shadow:0 30px 80px rgba(0,0,0,.55);
+    display:flex; flex-direction:column;
+  }
+  .slide.active{opacity:1; transform:scale(1); pointer-events:auto;}
+
+  /* scaling wrapper keeps 1280x720 aspect on any screen */
+  .stage{transform-origin:center center;}
+
+  /* ---------- COMMON SLIDE PARTS ---------- */
+  .s-head{padding:38px 56px 16px; position:relative;}
+  .s-kicker{display:flex; align-items:center; gap:12px; font-size:15px; font-weight:700;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--accent);}
+  .s-kicker .num{background:var(--accent); color:#fff; border-radius:6px; padding:3px 10px; font-size:14px;}
+  h1.s-title{font-size:38px; line-height:1.12; color:var(--navy); margin-top:10px; font-weight:800; letter-spacing:-.01em;}
+  .s-body{flex:1; padding:6px 56px 30px; display:flex; gap:34px; min-height:0;}
+  .s-head::after{content:""; position:absolute; left:56px; right:56px; bottom:0; height:3px;
+    background:linear-gradient(90deg,var(--accent),var(--amber) 60%,transparent);}
+
+  ul.clean{list-style:none; display:flex; flex-direction:column; gap:15px;}
+  ul.clean li{position:relative; padding-left:34px; font-size:21px; line-height:1.34; color:#26303d;}
+  ul.clean li::before{content:""; position:absolute; left:0; top:9px; width:16px; height:16px;
+    background:var(--accent); border-radius:4px; transform:rotate(45deg);}
+  ul.clean li b{color:var(--navy);}
+  .col{flex:1; min-width:0; display:flex; flex-direction:column; justify-content:center; gap:16px;}
+  .col.center{justify-content:center;}
+
+  .fig{background:#fff; border:1px solid var(--line); border-radius:10px; padding:12px;
+    box-shadow:0 8px 24px rgba(11,37,69,.10); display:flex; flex-direction:column; gap:8px; min-height:0;}
+  .fig img{width:100%; height:100%; object-fit:contain; border-radius:5px; min-height:0;}
+  .fig .cap{font-size:14px; color:var(--muted); text-align:center; font-style:italic;}
+  .fig.fill{flex:1;}
+
+  /* stat cards */
+  .cards{display:grid; grid-template-columns:repeat(2,1fr); gap:16px;}
+  .card{background:#fff; border:1px solid var(--line); border-left:5px solid var(--accent);
+    border-radius:10px; padding:16px 18px; box-shadow:0 6px 18px rgba(11,37,69,.07);}
+  .card .v{font-size:32px; font-weight:800; color:var(--navy); line-height:1;}
+  .card .l{font-size:15px; color:var(--muted); margin-top:7px;}
+  .card.ok{border-left-color:var(--ok);}
+  .card.gold{border-left-color:var(--gold);}
+  .card.blue{border-left-color:var(--blue);}
+
+  .pill{display:inline-block; background:#EAF1F8; color:var(--navy2); border-radius:30px;
+    padding:7px 16px; font-size:16px; font-weight:600; margin:4px 6px 0 0;}
+  .pill.red{background:#FCE9EA; color:var(--accent);}
+  .pill.amb{background:#FCF1E3; color:#B5651d;}
+
+  .note{background:#EFF4F9; border-radius:10px; padding:16px 20px; font-size:18px; color:var(--navy2);
+    border-left:5px solid var(--blue); line-height:1.4;}
+
+  /* footer */
+  .s-foot{position:absolute; bottom:14px; left:56px; right:56px; display:flex; justify-content:space-between;
+    align-items:center; font-size:13px; color:#9AA6B3;}
+  .s-foot .pg{font-weight:700; color:var(--steel);}
+
+  /* ---------- TITLE SLIDE ---------- */
+  .title-slide{background:radial-gradient(1200px 600px at 78% -10%, #1d4e7a 0%, var(--navy2) 42%, var(--navy) 100%); color:#fff;
+    justify-content:space-between; padding:54px 64px;}
+  .title-slide .uni{font-size:17px; line-height:1.5; color:#cfe0f0; max-width:760px;}
+  .title-slide .tag{font-size:14px; letter-spacing:.22em; text-transform:uppercase; color:var(--amber); font-weight:700;}
+  .title-slide h1{font-size:50px; line-height:1.1; font-weight:800; margin:14px 0 8px; max-width:980px; letter-spacing:-.01em;}
+  .title-slide .sub{font-size:20px; color:#e7eef6;}
+  .title-meta{display:flex; gap:60px; margin-top:18px;}
+  .title-meta .b{font-size:14px; color:#9fb6cc; letter-spacing:.06em; text-transform:uppercase;}
+  .title-meta .v{font-size:20px; color:#fff; font-weight:600; margin-top:4px;}
+  .ts-line{height:4px; width:120px; background:linear-gradient(90deg,var(--accent),var(--amber)); border-radius:3px; margin:6px 0 0;}
+
+  /* SECTION conclusion */
+  .concl{background:linear-gradient(135deg,var(--navy) 0%, var(--navy2) 100%); color:#fff;}
+  .concl h1.s-title{color:#fff;}
+  .concl .s-head::after{background:linear-gradient(90deg,var(--amber),var(--accent) 60%,transparent);}
+  .concl ul.clean li{color:#e6edf5;}
+  .concl ul.clean li b{color:#fff;}
+  .concl .card{background:rgba(255,255,255,.07); border-color:rgba(255,255,255,.14);}
+  .concl .card .v{color:#fff;} .concl .card .l{color:#bcd0e4;}
+
+  /* photo placeholder */
+  .ph{flex:1; border:2px dashed #B9C6D6; border-radius:12px; background:#fff;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; color:#8C9AAB; text-align:center; padding:20px;}
+  .ph .ic{font-size:46px;}
+  .ph .t{font-size:17px; font-weight:700; color:#6b7a8c;}
+  .ph .h{font-size:14px; color:#9aa6b3; max-width:300px; line-height:1.4;}
+
+  /* process steps */
+  .steps{display:flex; flex-direction:column; gap:11px;}
+  .step{display:flex; gap:14px; align-items:flex-start; background:#fff; border:1px solid var(--line);
+    border-radius:10px; padding:12px 16px; box-shadow:0 4px 12px rgba(11,37,69,.05);}
+  .step .n{flex:none; width:34px; height:34px; border-radius:8px; background:var(--navy2); color:#fff;
+    display:flex; align-items:center; justify-content:center; font-weight:800; font-size:17px;}
+  .step .tx{font-size:17px; line-height:1.3;}
+  .step .tx b{color:var(--navy);}
+  .step.hot .n{background:var(--accent);}
+
+  table.t{width:100%; border-collapse:collapse; font-size:17px; background:#fff; border-radius:10px; overflow:hidden;
+    box-shadow:0 6px 18px rgba(11,37,69,.07);}
+  table.t th{background:var(--navy2); color:#fff; text-align:left; padding:11px 14px; font-weight:700;}
+  table.t td{padding:10px 14px; border-top:1px solid var(--line);}
+  table.t tr:nth-child(even) td{background:#F7F9FC;}
+  table.t td.r,table.t th.r{text-align:right;}
+
+  /* ---------- CONTROLS ---------- */
+  .hud{position:fixed; bottom:16px; right:20px; display:flex; gap:8px; z-index:50;}
+  .hud button{background:rgba(255,255,255,.12); color:#fff; border:1px solid rgba(255,255,255,.25);
+    width:40px; height:40px; border-radius:8px; font-size:18px; cursor:pointer; backdrop-filter:blur(4px);}
+  .hud button:hover{background:rgba(255,255,255,.25);}
+  .counter{position:fixed; bottom:22px; left:24px; color:#fff; font-size:14px; opacity:.7; z-index:50; letter-spacing:.08em;}
+  .progress{position:fixed; top:0; left:0; height:4px; background:linear-gradient(90deg,var(--accent),var(--amber)); z-index:60; transition:width .35s;}
+  .hint{position:fixed; top:16px; right:20px; color:#fff; font-size:12px; opacity:.45; z-index:50;}
+
+  /* ---------- PRINT (PDF export) ---------- */
+  @media print{
+    @page{size:1280px 720px; margin:0;}
+    body{overflow:visible; background:#fff;}
+    .deck{position:static; display:block;}
+    .stage{transform:none !important;}
+    .slide{position:relative; opacity:1 !important; transform:none !important; page-break-after:always;
+      box-shadow:none; border-radius:0; width:1280px; height:720px; margin:0;}
+    .hud,.counter,.progress,.hint{display:none !important;}
+  }
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<div class="hint">← → / Space — листать &nbsp;•&nbsp; F — во весь экран &nbsp;•&nbsp; P — печать в PDF</div>
+<div class="deck"><div class="stage" id="stage">
+
+<!-- ============ SLIDE 1 — TITLE ============ -->
+<section class="slide title-slide active">
+  <div>
+    <div class="uni">Минобрнауки России · ФГБОУ ВО «Рязанский государственный радиотехнический университет имени В.Ф. Уткина»<br>Кафедра автоматизации информационных и технологических процессов</div>
+  </div>
+  <div>
+    <div class="tag">Выпускная квалификационная работа · бакалавриат</div>
+    <div class="ts-line"></div>
+    <h1>Инвестиционный проект производственного предприятия</h1>
+    <div class="sub">Малое производство комбинированных пожарных извещателей · ООО «СигналПром»</div>
+    <div class="title-meta">
+      <div><div class="b">Обучающийся</div><div class="v">Воробьёв П. А., гр. 237</div></div>
+      <div><div class="b">Руководитель</div><div class="v">к.т.н., доцент Сосулин Ю. А.</div></div>
+      <div><div class="b">Направление</div><div class="v">15.03.04</div></div>
+    </div>
+  </div>
+  <div class="s-foot"><span>Рязань · 2026</span><span class="pg">01</span></div>
+</section>
+
+<!-- ============ SLIDE 2 — АКТУАЛЬНОСТЬ ============ -->
+<section class="slide">
+  <div class="s-head"><div class="s-kicker"><span class="num">01</span> Введение</div>
+    <h1 class="s-title">Актуальность, цель и задачи</h1></div>
+  <div class="s-body">
+    <div class="col">
+      <div class="note"><b>Актуальность.</b> В 2024–2026 гг. рынок пожарной автоматики РФ трансформировался: запрет параллельного импорта (приказ Минпромторга №4611), технологический сбор с 01.09.2026 и ужесточение ГОСТ Р 53325-2024 / СП 484 сформировали защищённую нишу для отечественного производителя.</div>
+      <div>
+        <span class="pill red">Цель</span>
+        <p style="font-size:20px; line-height:1.4; margin-top:8px; color:#26303d;">Разработать инвестиционный проект малого предприятия по выпуску комбинированных пожарных извещателей и оценить его экономическую эффективность.</p>
+      </div>
+    </div>
+    <div class="col">
+      <span class="pill">Задачи</span>
+      <ul class="clean">
+        <li>Обосновать <b>технико-экономическую целесообразность</b> на основе анализа рынка</li>
+        <li>Определить <b>показатели эффективности</b> и выбрать инструмент моделирования</li>
+        <li>Разработать <b>производственную и организационную модель</b> с автоматизацией контроля качества</li>
+        <li>Построить <b>финансовую модель в Project Expert</b> и провести анализ чувствительности</li>
+      </ul>
+    </div>
+  </div>
+  <div class="s-foot"><span>Воробьёв П.А. · ВКР 2026</span><span class="pg">02</span></div>
+</section>
+
+<!-- ============ SLIDE 3 — РЫНОК ============ -->
+<section class="slide">
+  <div class="s-head"><div class="s-kicker"><span class="num">02</span> Технико-экономическое обоснование</div>
+    <h1 class="s-title">Анализ рынка пожарной автоматики</h1></div>
+  <div class="s-body">
+    <div class="col">
+      <div class="cards">
+        <div class="card"><div class="v">54 млрд ₽</div><div class="l">объём рынка РФ, 2025 г.</div></div>
+        <div class="card ok"><div class="v">+10%</div><div class="l">рост к 2024 году</div></div>
+        <div class="card blue"><div class="v">58,8 млрд ₽</div><div class="l">прогноз на 2026 г.</div></div>
+        <div class="card gold"><div class="v">CAGR 7,4%</div><div class="l">мировой рынок до 2032 г.</div></div>
+      </div>
+      <ul class="clean" style="margin-top:6px;">
+        <li>Запрет параллельного импорта вытеснил иностранные бренды (ТН ВЭД 8531)</li>
+        <li>Драйвер спроса — ввод <b>116,4 млн м²</b> жилья и складов класса A/B в 2025 г.</li>
+      </ul>
+    </div>
+    <div class="col">
+      <div class="fig fill"><img src="assets/fig/fig01_market.png" alt="Динамика рынка">
+        <div class="cap">Рис. 1 — Динамика объёма рынка пожарной автоматики РФ, 2023–2026 гг.</div></div>
+    </div>
+  </div>
+  <div class="s-foot"><span>Воробьёв П.А. · ВКР 2026</span><span class="pg">03</span></div>
+</section>
+
+<!-- ============ SLIDE 4 — КОНКУРЕНТЫ / НИША ============ -->
+<section class="slide">
+  <div class="s-head"><div class="s-kicker"><span class="num">03</span> Технико-экономическое обоснование</div>
+    <h1 class="s-title">Конкуренты и выбор ниши: гибридная автоматизация</h1></div>
+  <div class="s-body">
+    <div class="col">
+      <table class="t">
+        <tr><th>Группа</th><th>Модель</th><th class="r">Вход</th></tr>
+        <tr><td>Лидеры (Болид, Рубеж)</td><td>полные SMT-линии</td><td class="r">от 120 млн ₽</td></tr>
+        <tr><td>Средние игроки</td><td>частичное производство</td><td class="r">высокий</td></tr>
+        <tr><td><b>Наш проект</b></td><td><b>гибридная модель</b></td><td class="r"><b>≈ 5 млн ₽</b></td></tr>
+      </table>
+      <div class="note" style="margin-top:4px;"><b>Суть модели:</b> капиталоёмкий SMT-монтаж и литьё корпусов — на контрактном производстве («Резонит»); собственные ресурсы — на операциях с высокой добавленной стоимостью.</div>
+    </div>
+    <div class="col">
+      <span class="pill red">Почему ниша свободна</span>
+      <ul class="clean">
+        <li>Крупным невыгодно <b>малосерийное</b> производство (&lt; 700 шт/мес)</li>
+        <li>Они применяют <b>выборочный</b> контроль (1–5% партии по ГОСТ Р ИСО 2859)</li>
+        <li>Мы даём <b>100% контроль</b> каждого изделия — технологическое преимущество</li>
+        <li>Гибкая адаптация микрокода под заказчика (склады, серверные, общепит)</li>
+      </ul>
+    </div>
+  </div>
+  <div class="s-foot"><span>Воробьёв П.А. · ВКР 2026</span><span class="pg">04</span></div>
+</section>
+
+<!-- ============ SLIDE 5 — ПРОДУКЦИЯ И ЦЕНЫ ============ -->
+<section class="slide">
+  <div class="s-head"><div class="s-kicker"><span class="num">04</span> Продукт</div>
+    <h1 class="s-title">Продукция и ценовое позиционирование</h1></div>
+  <div class="s-body">
+    <div class="col">
+      <div class="ph">
+        <div class="ic">◎</div>
+        <div class="t">Фото извещателя ИПК 212/101-1-СП «Сигнал»</div>
+        <div class="h">Вставить фото комбинированного дымо-теплового извещателя (аналог ИП 212)</div>
+      </div>
+      <div class="cards">
+        <div class="card"><div class="v">1800 ₽</div><div class="l">отпускная цена (опт)</div></div>
+        <div class="card ok"><div class="v">79%</div><div class="l">валовая маржа</div></div>
+      </div>
+    </div>
+    <div class="col">
+      <ul class="clean">
+        <li><b>Дым + тепло</b> в одном корпусе: оптико-электронный и максимально-дифференциальный каналы</li>
+        <li>Встроенный <b>изолятор КЗ</b> — требование СП 484 (Изм. №1)</li>
+        <li>Помехозащищённость <b>10 В/м</b> по ГОСТ Р 53325-2024</li>
+      </ul>
+      <div class="fig"><img src="assets/fig/fig02_prices.png" alt="Цены">
+        <div class="cap">Рис. 2 — Сравнительный анализ отпускных цен извещателей</div></div>
+    </div>
+  </div>
+  <div class="s-foot"><span>Воробьёв П.А. · ВКР 2026</span><span class="pg">05</span></div>
+</section>
+
+<!-- ============ SLIDE 6 — ТЕХПРОЦЕСС / АВТОМАТИЗАЦИЯ ============ -->
+<section class="slide">
+  <div class="s-head"><div class="s-kicker"><span class="num">05</span> Проектная часть · Автоматизация</div>
+    <h1 class="s-title">Технологический процесс и автоматизация</h1></div>
+  <div class="s-body">
+    <div class="col">
+      <div class="steps">
+        <div class="step"><div class="n">1</div><div class="tx"><b>Входной контроль</b> комплектующих от контрактных производителей</div></div>
+        <div class="step"><div class="n">2</div><div class="tx"><b>Финишная сборка</b> платы и корпуса</div></div>
+        <div class="step hot"><div class="n">3</div><div class="tx"><b>Программирование МК</b> и загрузка микрокода</div></div>
+        <div class="step hot"><div class="n">4</div><div class="tx"><b>100% автотест</b> на стенде дымового и теплового каналов</div></div>
+        <div class="step"><div class="n">5</div><div class="tx"><b>MES-вердикт</b> и маркировка / упаковка</div></div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="fig fill"><img src="assets/fig/fig05_process.png" alt="Блок-схема техпроцесса">
+        <div class="cap">Рис. 5 — Блок-схема техпроцесса сборки и контроля качества</div></div>
+    </div>
+  </div>
+  <div class="s-foot"><span>Воробьёв П.А. · ВКР 2026</span><span class="pg">06</span></div>
+</section>
+
+<!-- ============ SLIDE 7 — КОНТРОЛЬ КАЧЕСТВА / MES ============ -->
+<section class="slide">
+  <div class="s-head"><div class="s-kicker"><span class="num">06</span> Проектная часть · Автоматизация</div>
+    <h1 class="s-title">Автоматизированный контроль качества: стенд + MES</h1></div>
+  <div class="s-body">
+    <div class="col">
+      <ul class="clean">
+        <li><b>Стенд «СИ-ТДК»</b> — аэродинамический дымовой канал + климатическая камера теплового канала</li>
+        <li><b>100% выходной контроль</b> каждого изделия вместо выборочного 1–5%</li>
+        <li><b>MES-система</b> обеспечивает сквозную прослеживаемость по серийному номеру</li>
+        <li>Аппаратная <b>блокировка печати этикетки</b> для бракованного изделия — брак физически не выйдет за цех</li>
+      </ul>
+      <div class="note"><b>Ключевое преимущество для защиты:</b> автоматизация контроля исключает человеческий фактор и репутационные риски (штрафы МЧС за ложные срабатывания на объектах Ф1.1, Ф4.1).</div>
+    </div>
+    <div class="col">
+      <div class="ph">
+        <div class="ic">⚙</div>
+        <div class="t">Фото стенда дымо-теплового контроля</div>
+        <div class="h">Вставить фото испытательного стенда / климатической камеры / автоматизированного рабочего места</div>
+      </div>
+    </div>
+  </div>
+  <div class="s-foot"><span>Воробьёв П.А. · ВКР 2026</span><span class="pg">07</span></div>
+</section>
+
+<!-- ============ SLIDE 8 — ОБОРУДОВАНИЕ И CAPEX ============ -->
+<section class="slide">
+  <div class="s-head"><div class="s-kicker"><span class="num">07</span> Проектная часть</div>
+    <h1 class="s-title">Предприятие, оборудование и CAPEX</h1></div>
+  <div class="s-body">
+    <div class="col">
+      <div class="cards">
+        <div class="card"><div class="v">4,97 млн ₽</div><div class="l">капитальные вложения (CAPEX)</div></div>
+        <div class="card blue"><div class="v">142,5 м²</div><div class="l">площадь цеха, г. Рязань</div></div>
+      </div>
+      <div class="ph" style="min-height:200px;">
+        <div class="ic">▣</div>
+        <div class="t">Фото оборудования / цеха</div>
+        <div class="h">Стенд тестирования, паяльная станция, рабочие места сборки</div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="fig fill"><img src="assets/fig/fig03_capex.png" alt="CAPEX">
+        <div class="cap">Рис. 3 — Структура капитальных вложений (CAPEX)</div></div>
+    </div>
+  </div>
+  <div class="s-foot"><span>Воробьёв П.А. · ВКР 2026</span><span class="pg">08</span></div>
+</section>
+
+<!-- ============ SLIDE 9 — PROJECT EXPERT: ИСХОДНЫЕ ============ -->
+<section class="slide">
+  <div class="s-head"><div class="s-kicker"><span class="num">08</span> Project Expert</div>
+    <h1 class="s-title">Исходные данные и макроокружение модели</h1></div>
+  <div class="s-body">
+    <div class="col center">
+      <div class="cards">
+        <div class="card"><div class="v">01.03.2026</div><div class="l">старт проекта</div></div>
+        <div class="card blue"><div class="v">36 мес</div><div class="l">горизонт планирования</div></div>
+        <div class="card"><div class="v">01.07.2026</div><div class="l">выход на операционную деятельность</div></div>
+        <div class="card gold"><div class="v">УСН 15%</div><div class="l">«доходы минус расходы»</div></div>
+      </div>
+    </div>
+    <div class="col center">
+      <span class="pill">Параметры расчёта</span>
+      <ul class="clean">
+        <li>Ставка дисконтирования — <b>14,5%</b> (учёт риска МСП)</li>
+        <li>Инфляция — <b>заложена по модулю</b> Project Expert</li>
+        <li>Страховые взносы на ФОТ — <b>30%</b></li>
+        <li>Инструмент — <b>Project Expert 6 Holding</b>: имитационная модель денежных потоков</li>
+      </ul>
+    </div>
+  </div>
+  <div class="s-foot"><span>Воробьёв П.А. · ВКР 2026</span><span class="pg">09</span></div>
+</section>
+
+<!-- ============ SLIDE 10 — КАЛЕНДАРНЫЙ ПЛАН ============ -->
+<section class="slide">
+  <div class="s-head"><div class="s-kicker"><span class="num">09</span> Project Expert</div>
+    <h1 class="s-title">Календарный план (диаграмма Ганта)</h1></div>
+  <div class="s-body">
+    <div class="col" style="flex:1.7;">
+      <div class="fig fill"><img src="assets/fig/fig14_gantt.png" alt="Гант">
+        <div class="cap">Рис. 14 — Календарный план реализации проекта</div></div>
+    </div>
+    <div class="col">
+      <span class="pill red">Инвестиционная фаза</span>
+      <ul class="clean">
+        <li><b>4 месяца</b> подготовки: март–июнь 2026</li>
+        <li>Ремонт помещения и пусконаладка оборудования</li>
+        <li>Сертификация по <b>ТР ЕАЭС 043/2017</b></li>
+        <li>Старт продаж — <b>июль 2026</b></li>
+      </ul>
+    </div>
+  </div>
+  <div class="s-foot"><span>Воробьёв П.А. · ВКР 2026</span><span class="pg">10</span></div>
+</section>
+
+<!-- ============ SLIDE 11 — ОПЕРАЦИОННЫЙ ПЛАН ============ -->
+<section class="slide">
+  <div class="s-head"><div class="s-kicker"><span class="num">10</span> Project Expert</div>
+    <h1 class="s-title">Операционный план: сбыт и себестоимость</h1></div>
+  <div class="s-body">
+    <div class="col">
+      <div class="fig fill"><img src="assets/fig/fig15_sales.png" alt="План сбыта">
+        <div class="cap">Рис. 15 — Модуль «План сбыта»</div></div>
+    </div>
+    <div class="col center">
+      <div class="cards">
+        <div class="card"><div class="v">382 ₽</div><div class="l">прямая себестоимость (BOM)</div></div>
+        <div class="card ok"><div class="v">700 шт/мес</div><div class="l">выход на проектную мощность</div></div>
+      </div>
+      <ul class="clean">
+        <li>Поэтапное наращивание объёма в первый год</li>
+        <li>Маржинальность изделия — <b>79%</b></li>
+        <li>Штат предприятия — компактная команда</li>
+      </ul>
+    </div>
+  </div>
+  <div class="s-foot"><span>Воробьёв П.А. · ВКР 2026</span><span class="pg">11</span></div>
+</section>
+
+<!-- ============ SLIDE 12 — КРЕДИТ МСП ============ -->
+<section class="slide">
+  <div class="s-head"><div class="s-kicker"><span class="num">11</span> Финансирование</div>
+    <h1 class="s-title">Источники финансирования: кредит МСП</h1></div>
+  <div class="s-body">
+    <div class="col">
+      <div class="cards">
+        <div class="card blue"><div class="v">2 млн ₽</div><div class="l">собственные средства</div></div>
+        <div class="card"><div class="v">7 млн ₽</div><div class="l">кредит по программе МСП</div></div>
+        <div class="card ok"><div class="v">12%</div><div class="l">льготная ставка (рынок ~22–25%)</div></div>
+        <div class="card gold"><div class="v">35 мес</div><div class="l">срок кредита</div></div>
+      </div>
+    </div>
+    <div class="col center">
+      <span class="pill red">Почему именно МСП</span>
+      <ul class="clean">
+        <li>Льготная ставка <b>вдвое ниже</b> рыночной — снижает финансовую нагрузку</li>
+        <li>Проект подходит под <b>программы господдержки</b> малого бизнеса и грант «Мой бизнес»</li>
+        <li>Производство отечественных извещателей — <b>приоритетная отрасль</b></li>
+        <li>Кредит покрывает CAPEX и кассовый разрыв инвестфазы</li>
+      </ul>
+      <div class="fig"><img src="assets/fig/fig20_credit.png" alt="Кредиты">
+        <div class="cap">Рис. 20 — Модуль «Кредиты» в Project Expert</div></div>
+    </div>
+  </div>
+  <div class="s-foot"><span>Воробьёв П.А. · ВКР 2026</span><span class="pg">12</span></div>
+</section>
+
+<!-- ============ SLIDE 13 — ДОХОДЫ/ОКУПАЕМОСТЬ ============ -->
+<section class="slide">
+  <div class="s-head"><div class="s-kicker"><span class="num">12</span> Результаты</div>
+    <h1 class="s-title">Доходы, расходы и окупаемость проекта</h1></div>
+  <div class="s-body">
+    <div class="col">
+      <div class="fig fill"><img src="assets/fig/fig21_revenue.png" alt="Доходы/расходы">
+        <div class="cap">Рис. 21 — Динамика доходов и расходов</div></div>
+    </div>
+    <div class="col">
+      <div class="fig fill"><img src="assets/fig/fig23_payback.png" alt="Окупаемость">
+        <div class="cap">Рис. 23 — График окупаемости проекта</div></div>
+    </div>
+  </div>
+  <div class="s-foot"><span>Воробьёв П.А. · ВКР 2026</span><span class="pg">13</span></div>
+</section>
+
+<!-- ============ SLIDE 14 — КПЭ ============ -->
+<section class="slide">
+  <div class="s-head"><div class="s-kicker"><span class="num">13</span> Результаты</div>
+    <h1 class="s-title">Ключевые показатели эффективности</h1></div>
+  <div class="s-body">
+    <div class="col center">
+      <div class="cards">
+        <div class="card ok"><div class="v">4,29 млн ₽</div><div class="l">NPV — чистый дисконтированный доход</div></div>
+        <div class="card"><div class="v">51,81%</div><div class="l">IRR — внутренняя норма доходности</div></div>
+        <div class="card gold"><div class="v">1,61</div><div class="l">PI — индекс прибыльности</div></div>
+        <div class="card blue"><div class="v">26 мес</div><div class="l">DPB — дисконтированный срок окупаемости</div></div>
+      </div>
+      <div class="note" style="margin-top:6px;">IRR <b>51,81%</b> существенно превышает ставку дисконтирования 14,5% → проект создаёт стоимость; PI &gt; 1 подтверждает прибыльность.</div>
+    </div>
+    <div class="col center">
+      <div class="fig fill"><img src="assets/fig/fig22_efficiency.png" alt="Эффективность">
+        <div class="cap">Рис. 22 — Эффективность инвестиций (Project Expert)</div></div>
+    </div>
+  </div>
+  <div class="s-foot"><span>Воробьёв П.А. · ВКР 2026</span><span class="pg">14</span></div>
+</section>
+
+<!-- ============ SLIDE 15 — ЧУВСТВИТЕЛЬНОСТЬ ============ -->
+<section class="slide">
+  <div class="s-head"><div class="s-kicker"><span class="num">14</span> Анализ устойчивости</div>
+    <h1 class="s-title">Анализ чувствительности проекта</h1></div>
+  <div class="s-body">
+    <div class="col">
+      <div class="fig fill"><img src="assets/fig/fig26_sens_npv.png" alt="Чувствительность NPV">
+        <div class="cap">Рис. 26 — Анализ чувствительности по NPV</div></div>
+    </div>
+    <div class="col center">
+      <span class="pill red">Выводы</span>
+      <ul class="clean">
+        <li>Наиболее критичный фактор — <b>цена реализации</b></li>
+        <li>Проект <b>устойчив</b> к снижению объёма сбыта на <b>10–15%</b></li>
+        <li>Устойчив к росту CAPEX и прямых издержек</li>
+      </ul>
+      <div class="note">Запас прочности подтверждает инвестиционную привлекательность проекта в среднесрочной перспективе.</div>
+    </div>
+  </div>
+  <div class="s-foot"><span>Воробьёв П.А. · ВКР 2026</span><span class="pg">15</span></div>
+</section>
+
+<!-- ============ SLIDE 16 — ЗАКЛЮЧЕНИЕ ============ -->
+<section class="slide concl">
+  <div class="s-head"><div class="s-kicker" style="color:var(--amber)"><span class="num" style="background:var(--amber); color:var(--navy)">15</span> Заключение</div>
+    <h1 class="s-title">Выводы по работе</h1></div>
+  <div class="s-body">
+    <div class="col center">
+      <ul class="clean">
+        <li>Обоснована <b>технико-экономическая целесообразность</b> предприятия в защищённой рыночной нише</li>
+        <li>Разработана модель <b>гибридной автоматизации</b> со 100% контролем качества</li>
+        <li>Финансовая модель в <b>Project Expert</b> подтвердила эффективность проекта</li>
+        <li>Проект <b>рекомендован к реализации</b> и пригоден как основа бизнес-плана для привлечения финансирования</li>
+      </ul>
+    </div>
+    <div class="col center">
+      <div class="cards">
+        <div class="card ok"><div class="v">NPV 4,29 млн</div><div class="l">положительный</div></div>
+        <div class="card"><div class="v">IRR 51,81%</div><div class="l">&gt; ставки 14,5%</div></div>
+        <div class="card gold"><div class="v">PI 1,61</div><div class="l">&gt; 1</div></div>
+        <div class="card blue"><div class="v">DPB 26 мес</div><div class="l">в пределах горизонта</div></div>
+      </div>
+      <div class="note" style="background:rgba(244,162,97,.15); border-left-color:var(--amber); color:#fff;">Цель работы достигнута. Благодарю за внимание — готов ответить на вопросы.</div>
+    </div>
+  </div>
+  <div class="s-foot"><span>Воробьёв П.А. · РГРТУ · 2026</span><span class="pg">16</span></div>
+</section>
+
+</div></div>
+
+<div class="counter" id="counter">01 / 16</div>
+<div class="hud">
+  <button onclick="go(-1)" title="Назад">‹</button>
+  <button onclick="go(1)" title="Вперёд">›</button>
+  <button onclick="toggleFs()" title="Полный экран">⛶</button>
+  <button onclick="window.print()" title="Печать в PDF">⤓</button>
+</div>
+
+<script>
+  const slides=[...document.querySelectorAll('.slide')];
+  let i=0;
+  const counter=document.getElementById('counter');
+  const progress=document.getElementById('progress');
+  const stage=document.getElementById('stage');
+
+  function render(){
+    slides.forEach((s,k)=>s.classList.toggle('active',k===i));
+    counter.textContent=String(i+1).padStart(2,'0')+' / '+String(slides.length).padStart(2,'0');
+    progress.style.width=((i+1)/slides.length*100)+'%';
+  }
+  function go(d){ i=Math.min(slides.length-1,Math.max(0,i+d)); render(); }
+  function toggleFs(){ if(!document.fullscreenElement){document.documentElement.requestFullscreen();} else {document.exitFullscreen();} }
+
+  // fit 1280x720 stage to viewport
+  function fit(){
+    const sw=window.innerWidth, sh=window.innerHeight;
+    const scale=Math.min(sw/1280, sh/720);
+    stage.style.transform='scale('+scale+')';
+  }
+  window.addEventListener('resize',fit); fit();
+
+  document.addEventListener('keydown',e=>{
+    if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();go(1);}
+    else if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();go(-1);}
+    else if(e.key==='Home'){i=0;render();}
+    else if(e.key==='End'){i=slides.length-1;render();}
+    else if(e.key.toLowerCase()==='f'){toggleFs();}
+    else if(e.key.toLowerCase()==='p'){window.print();}
+  });
+  render();
+</script>
+</body>
+</html>
